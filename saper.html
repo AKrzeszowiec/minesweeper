@@ -1,0 +1,26 @@
+<html>
+
+<head>
+   <script language="JavaScript" type="text/JavaScript" src="saper.js">
+   </script>  
+</head>
+<body>
+<div id="formContainer">
+   <form name="parameters">
+       <p> Width:
+       <input name="width" type="text" value="8" onchange="widthOnChange()" onblur="onBlur()" />
+       </p>
+        <p> Height:
+       <input name="height" type="text" value="8" onchange="heightOnChange()" onblur="onBlur()" />
+       </p>
+        <p> Bombs:
+       <input name="bombs" type="text" value="63" onchange="bombsOnChange()" onblur="onBlur()"/>
+       </p>
+       <input name="submit" type="button" value="Play!" onclick="onSubmit()" />
+   </form>
+</div>
+<div id="gameContainer">
+</div>
+</body>
+    
+</html>
