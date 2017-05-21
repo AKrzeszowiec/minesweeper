@@ -17,7 +17,8 @@ function onSubmit() {
         alert("Too many bombs you dumb fuck!");
         document.parameters.bombs.focus();
     }
-    tableCreation(height,width, bombs); // if all is fine then we can proceed to generating the table
+    var gameMatrix=tableCreation(height,width,bombs); // if all is fine then we can proceed to generating the table
+    onClick(gameMatrix,height,width);
     }
     
 }
@@ -145,5 +146,48 @@ function tableCreation(height, width, bombs) {
     var gameContainer=document.getElementById("gameContainer");
     gameContainer.innerHTML="";
     gameContainer.appendChild(table);
+    return gameMatrix;
 }
 
+function onClick(gameMatrix,height,width) {
+    var td=document.querySelectorAll("td");
+    for (i=0; i<td.length; i++) {
+        td[i].onclick=function() {
+            var id=this.id;
+            id=id.split(".");
+            if (this.className=="") {
+                this.className="clicked";
+                if (gameMatrix[id[0]][id[1]]=="0") {
+                    revealingZeros(id[0],id[1],gameMatrix,height,width);
+                }
+            }
+
+            if (gameMatrix[id[0]][id[1]]=="B") {
+                alert("oh crap");
+            }
+         
+        }
+        td[i].oncontextmenu=function() {
+            alert("right key!");
+            return false;
+        }
+    }
+}
+
+function revealingZeros(xcord,ycord,gameMatrix,height,width){
+    var fieldNeighbourhood=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+    for (var field=0; field<8; field++) {
+    var x=parseInt(xcord)+parseInt(fieldNeighbourhood[field][0]);
+    var y=parseInt(ycord)+parseInt(fieldNeighbourhood[field][1]);
+    if(x>=0 && x<height && y>=0 && y<width) {
+        newId=x+"."+y;
+        if (gameMatrix[x][y]=="0" && document.getElementById(newId).className==""){
+            document.getElementById(newId).className="clicked";
+            revealingZeros(x,y,gameMatrix,height,width);
+            }
+        else {
+            document.getElementById(newId).className="clicked";
+        }
+        }
+    }
+}
