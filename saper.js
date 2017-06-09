@@ -5,11 +5,15 @@ var bombs
 var bool=true; //stating if all values are correct
 var focus; //where the focus is directed
 var fieldNeighbourhood=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+var fieldsToReveal // will count how many fields we still have to reveal before the game is finished
+var bombsCounter //for displaying how many bombs to flag we have left
 
 function onSubmit() {
-    var width=document.parameters.width.value;
-    var height=document.parameters.height.value;
-    var bombs=document.parameters.bombs.value;
+    width=document.parameters.width.value
+    height=document.parameters.height.value;
+    bombs=document.parameters.bombs.value;
+    fieldsToReveal=(height*width)-bombs;
+    bombsCounter=bombs;
     if (!bool) {
     }
     else {
@@ -201,6 +205,7 @@ function onClicking(gameMatrix,height,width) {
                                 newId=x+"."+y; //for the sake of changing class of revealed cells
                                 if (gameMatrix[x][y]=="0" && document.getElementById(newId).className==""){ // zero in the field
                                 document.getElementById(newId).className="clicked";
+                                fieldsToReveal--;
                                 revealingZeros(x,y,gameMatrix,height,width); // if we run into a zero, then we run the function again
                                 }
                                 else if (gameMatrix[x][y]=="B" && document.getElementById(newId).className==""){ //bomb in the field
@@ -208,6 +213,7 @@ function onClicking(gameMatrix,height,width) {
                                 }
                                 else if (document.getElementById(newId).className=="") { // other cases
                                 document.getElementById(newId).className="clicked";
+                                fieldsToReveal--;
                                 }
                             }
                         }
@@ -218,6 +224,7 @@ function onClicking(gameMatrix,height,width) {
                 
                 if (this.className=="") { //we change the class to "clicked"
                     this.className="clicked";
+                    fieldsToReveal--;
                     if (gameMatrix[id[0]][id[1]]=="0") { //if we clicked on 0, we reveal all the adjacent cells
                         revealingZeros(id[0],id[1],gameMatrix,height,width);
                     }
@@ -233,15 +240,19 @@ function onClicking(gameMatrix,height,width) {
                 }
                 else if (this.className=="flag") {
                     this.className="";
+                    bombsCounter++;
                 }
                 else {
                     this.className="flag";
+                    bombsCounter--;
                 }
 
             }
             
 
-
+            if (fieldsToReveal==0) {
+                alert("You won!");
+            }
         }
 
 
@@ -259,10 +270,12 @@ function revealingZeros(xcord,ycord,gameMatrix,height,width){
         newId=x+"."+y; //for the sake of changing class of revealed cells
         if (gameMatrix[x][y]=="0" && document.getElementById(newId).className==""){
             document.getElementById(newId).className="clicked";
+            fieldsToReveal--;
             revealingZeros(x,y,gameMatrix,height,width); // if we run into a zero, then we run the function again
             }
         else if (document.getElementById(newId).className=="") {
             document.getElementById(newId).className="clicked";
+            fieldsToReveal--;
         }
         }
     }
