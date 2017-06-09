@@ -1,4 +1,4 @@
-//form check
+//  ------------- checking the form and storing important data   ---------
 var width
 var height
 var bombs
@@ -18,7 +18,7 @@ function onSubmit() {
         document.parameters.bombs.focus();
     }
     var gameMatrix=tableCreation(height,width,bombs); // if all is fine then we can proceed to generating the table
-    onClick(gameMatrix,height,width);
+    onClicking(gameMatrix,height,width);
     }
     
 }
@@ -79,7 +79,9 @@ function onBlur() {
 
 //form check end
 
-//generating table
+
+
+// ----------------------- function generating the game table ---------------------
 function tableCreation(height, width, bombs) {
     
     //create a matrix the size of the game area
@@ -106,15 +108,12 @@ function tableCreation(height, width, bombs) {
             placedBombs++;
         }
     }
-
+var fieldNeighbourhood=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
     // how many bombs are in the neighbourhood of a field?
    for (var i=0; i<height; i++) {        
         for (var j=0; j<width; j++) {
             var amountOfBombs=0;
             if (gameMatrix[i][j]!="B") {
-
-
-                var fieldNeighbourhood=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
                 for (var field=0; field<8; field++) {
                     var testx=i+parseInt(fieldNeighbourhood[field][0]);
                     var testy=j+parseInt(fieldNeighbourhood[field][1]);
@@ -149,43 +148,119 @@ function tableCreation(height, width, bombs) {
     return gameMatrix;
 }
 
-function onClick(gameMatrix,height,width) {
-    var td=document.querySelectorAll("td");
-    for (i=0; i<td.length; i++) {
-        td[i].onclick=function() {
-            var id=this.id;
-            id=id.split(".");
-            if (this.className=="") {
-                this.className="clicked";
-                if (gameMatrix[id[0]][id[1]]=="0") {
-                    revealingZeros(id[0],id[1],gameMatrix,height,width);
-                }
-            }
 
-            if (gameMatrix[id[0]][id[1]]=="B") {
-                alert("oh crap");
-            }
-         
-        }
-        td[i].oncontextmenu=function() {
-            alert("right key!");
+
+// ---------- Function handling clicks on the game area  ------------------
+
+
+function onClicking(gameMatrix,height,width) {
+    var td=document.querySelectorAll("td"); // we take all the cells
+    for (i=0; i<td.length; i++) {
+        td[i].oncontextmenu=function() { //we don't want context menu to show
             return false;
         }
+        var id;
+        var whichButton
+        td[i].onmousedown=function(e) {
+            if (e.buttons==3 || e.buttons==4) { //both clicked
+                whichButton=3;
+            }
+            else if (e.buttons==1) { //left clicked
+                whichButton=1;
+            }
+            else if (e.buttons==2) { //right cliked
+                whichButton=2;
+            }
+        }
+        td[i].onmouseup=function(e) {
+
+            id=this.id;
+            id=id.split("."); //we retrive which row and column we're at
+    
+            if (whichButton==3) { //both cliked
+                //we want to reveal all the adjacent fields
+                if(this.className=="clicked") {
+                    var flagCounter=0;
+                    var newId
+                    for (var field=0; field<8; field++) { //we count flags around the field
+                        var x=parseInt(id[0])+parseInt(fieldNeighbourhood[field][0]);
+                        var y=parseInt(id[1])+parseInt(fieldNeighbourhood[field][1]);
+                        if(x>=0 && x<height && y>=0 && y<width) {
+                            newId=x+"."+y
+                            if (document.getElementById(newId).className=="flag") {
+                                flagCounter++;
+                            }
+                        }
+                    }
+                    if(flagCounter==gameMatrix[id[0]][id[1]]) { //we check if there are as many flags around as the cell says
+                        for (var field=0; field<8; field++) {
+                            var x=parseInt(id[0])+parseInt(fieldNeighbourhood[field][0]);
+                            var y=parseInt(id[1])+parseInt(fieldNeighbourhood[field][1]);
+                            if(x>=0 && x<height && y>=0 && y<width) {
+                                newId=x+"."+y; //for the sake of changing class of revealed cells
+                                if (gameMatrix[x][y]=="0" && document.getElementById(newId).className==""){ // zero in the field
+                                document.getElementById(newId).className="clicked";
+                                revealingZeros(x,y,gameMatrix,height,width); // if we run into a zero, then we run the function again
+                                }
+                                else if (gameMatrix[x][y]=="B" && document.getElementById(newId).className==""){ //bomb in the field
+                                    alert("Oh crap!");
+                                }
+                                else if (document.getElementById(newId).className=="") { // other cases
+                                document.getElementById(newId).className="clicked";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else if(whichButton==1){ //left click
+                
+                if (this.className=="") { //we change the class to "clicked"
+                    this.className="clicked";
+                    if (gameMatrix[id[0]][id[1]]=="0") { //if we clicked on 0, we reveal all the adjacent cells
+                        revealingZeros(id[0],id[1],gameMatrix,height,width);
+                    }
+                }
+
+                if (gameMatrix[id[0]][id[1]]=="B") {
+                    alert("oh crap");  
+                }
+            }
+            else if (whichButton==2){ //right click
+                if (this.className=="clicked") {
+                    alert("you can't place a flag here you dumb ass!");
+                }
+                else if (this.className=="flag") {
+                    this.className="";
+                }
+                else {
+                    this.className="flag";
+                }
+
+            }
+            
+
+
+        }
+
+
     }
 }
 
+// function which will reveal all the adjacent cells to a cliked zero 
+// (and to all the zeroes in the neighbourhood) and changes their class to "clicked"
 function revealingZeros(xcord,ycord,gameMatrix,height,width){
-    var fieldNeighbourhood=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+    
     for (var field=0; field<8; field++) {
     var x=parseInt(xcord)+parseInt(fieldNeighbourhood[field][0]);
     var y=parseInt(ycord)+parseInt(fieldNeighbourhood[field][1]);
     if(x>=0 && x<height && y>=0 && y<width) {
-        newId=x+"."+y;
+        newId=x+"."+y; //for the sake of changing class of revealed cells
         if (gameMatrix[x][y]=="0" && document.getElementById(newId).className==""){
             document.getElementById(newId).className="clicked";
-            revealingZeros(x,y,gameMatrix,height,width);
+            revealingZeros(x,y,gameMatrix,height,width); // if we run into a zero, then we run the function again
             }
-        else {
+        else if (document.getElementById(newId).className=="") {
             document.getElementById(newId).className="clicked";
         }
         }

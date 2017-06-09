@@ -5,3 +5,7 @@ table tr td {
 .clicked {
     background-color: white;
 }
+
+.flag {
+    background-color: red;
+}
