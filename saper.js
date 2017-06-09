@@ -4,6 +4,7 @@ var height
 var bombs
 var bool=true; //stating if all values are correct
 var focus; //where the focus is directed
+var fieldNeighbourhood=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
 
 function onSubmit() {
     var width=document.parameters.width.value;
@@ -108,7 +109,7 @@ function tableCreation(height, width, bombs) {
             placedBombs++;
         }
     }
-var fieldNeighbourhood=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+
     // how many bombs are in the neighbourhood of a field?
    for (var i=0; i<height; i++) {        
         for (var j=0; j<width; j++) {
@@ -212,7 +213,7 @@ function onClicking(gameMatrix,height,width) {
                         }
                     }
                 }
-            }
+            } 
             else if(whichButton==1){ //left click
                 
                 if (this.className=="") { //we change the class to "clicked"
@@ -245,8 +246,8 @@ function onClicking(gameMatrix,height,width) {
 
 
     }
-}
 
+}
 // function which will reveal all the adjacent cells to a cliked zero 
 // (and to all the zeroes in the neighbourhood) and changes their class to "clicked"
 function revealingZeros(xcord,ycord,gameMatrix,height,width){
@@ -266,3 +267,4 @@ function revealingZeros(xcord,ycord,gameMatrix,height,width){
         }
     }
 }
+
