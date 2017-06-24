@@ -7,6 +7,9 @@ var focus; //where the focus is directed
 var fieldNeighbourhood=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
 var fieldsToReveal // will count how many fields we still have to reveal before the game is finished
 var bombsCounter //for displaying how many bombs to flag we have left
+var startTime //the time of the first click
+var endTime //the time of the last click
+var firstClick=true; //checking if we clicked for the first time
 
 function onSubmit() {
     width=document.parameters.width.value
@@ -176,6 +179,10 @@ function onClicking(gameMatrix,height,width) {
             else if (e.buttons==2) { //right cliked
                 whichButton=2;
             }
+            if(firstClick==true){
+                firstClick=false;
+                startTime=Date.now();
+            }
         }
         td[i].onmouseup=function(e) {
 
@@ -251,7 +258,13 @@ function onClicking(gameMatrix,height,width) {
             
 
             if (fieldsToReveal==0) {
+                endTime=Date.now();
+                var gameTime=endTime-startTime;
+                gameTime=gameTime/10;
+                gameTime=Math.ceil(gameTime);
+                gameTime=gameTime/100;
                 alert("You won!");
+                alert(gameTime);
             }
         }
 
