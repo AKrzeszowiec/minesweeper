@@ -8,18 +8,23 @@
 </head>
 <body>
 <div id="formContainer">
-   <form name="parameters">
-       <p> Width:
-       <input name="width" type="text" value="8" onchange="widthOnChange()" onblur="onBlur()" />
-       </p>
+    <form name="parameters">
+        <p>
+           <input name="skill_level" type="radio" value="beginner" checked onclick="skill_levelOnClick()" />Beginner
+           <input name="skill_level" type="radio" value="intermediate" onclick="skill_levelOnClick()" />Intermediate
+           <input name="skill_level" type="radio" value="expert" onclick="skill_levelOnClick()" />Expert
+           <input name="skill_level" type="radio" value="custom" onclick="skill_levelOnClick()" />Custom
+        <p> Width:
+            <input name="width" type="number" min="8" max="30" value="8" onchange="widthOnChange()" onblur="onBlur()" readonly />
+        </p>
         <p> Height:
-       <input name="height" type="text" value="8" onchange="heightOnChange()" onblur="onBlur()" />
-       </p>
+            <input name="height" type="number" min="8" max="24" value="8" onchange="heightOnChange()" onblur="onBlur()" readonly />
+        </p>
         <p> Bombs:
-       <input name="bombs" type="text" value="10" onchange="bombsOnChange()" onblur="onBlur()"/>
-       </p>
-       <input name="submit" type="button" value="Play!" onclick="onSubmit()" />
-   </form>
+            <input name="bombs" type="number" min="10" max="667" value="10" onchange="bombsOnChange()" onblur="onBlur()" readonly/>
+        </p>
+            <input name="submit" type="button" value="Play!" onclick="onSubmit()" />
+    </form>
 </div>
 <div id="gameContainer">
 </div>

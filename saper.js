@@ -1,14 +1,15 @@
 //  ------------- checking the form and storing important data   ---------
-var width
-var height
-var bombs
+var width;
+var height;
+var bombs;
+var skillLevel;
 var bool=true; //stating if all values are correct
 var focus; //where the focus is directed
 var fieldNeighbourhood=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
-var fieldsToReveal // will count how many fields we still have to reveal before the game is finished
+var fieldsToReveal; // will count how many fields we still have to reveal before the game is finished
 var bombsCounter //for displaying how many bombs to flag we have left
-var startTime //the time of the first click
-var endTime //the time of the last click
+var startTime; //the time of the first click
+var endTime; //the time of the last click
 var firstClick=true; //checking if we clicked for the first time
 
 function onSubmit() {
@@ -31,8 +32,30 @@ function onSubmit() {
     
 }
 
+function skill_levelOnClick() {
+    var defaultValues=[[8,8,10],[16,16,40],[30,16,99],[8,8,10]];
+    for (var i=0; i<4; i++) {
+        if(document.parameters.skill_level[i].checked) {
+            document.parameters.width.value=defaultValues[i][0];
+            document.parameters.height.value=defaultValues[i][1];
+            document.parameters.bombs.value=defaultValues[i][2];
+            if(i==3) {
+                document.parameters.width.removeAttribute("readonly");
+                document.parameters.height.removeAttribute("readonly");
+                document.parameters.bombs.removeAttribute("readonly");    
+            }
+            if(i!=3) {
+                document.parameters.width.setAttribute("readonly","true");
+                document.parameters.height.setAttribute("readonly","true");
+                document.parameters.bombs.setAttribute("readonly","true");               
+            }
+        }
+    }
+
+}
+
 function widthOnChange() {
-    var width=document.parameters.width.value;
+    width=document.parameters.width.value;
     var regExp=/\b\d\d\b|\b\d\b/;
     var twoDigits=regExp.test(width);
     if (isNaN(width) || !twoDigits || width<8 || width>30) {
@@ -46,9 +69,10 @@ function widthOnChange() {
     }
 }
 
+// in the function below the validation is added in case the browser doesn't support HTML5
 
 function heightOnChange() {
-    var height=document.parameters.height.value;
+    height=document.parameters.height.value;
     var regExp=/\b\d\d\b|\b\d\b/;
     var twoDigits=regExp.test(height);
     if (isNaN(height) || !twoDigits || height<8 || height>24) {
@@ -63,7 +87,7 @@ function heightOnChange() {
 }
 
 function bombsOnChange() {
-    var bombs=document.parameters.bombs.value;
+    bombs=document.parameters.bombs.value;
     var regExp=/\b\d\d\b|\b\d\b|\b\d\d\d\b/;
     var twoDigits=regExp.test(bombs);
     if (isNaN(bombs) || !twoDigits || bombs<10 || bombs>667) {
