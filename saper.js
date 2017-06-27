@@ -3,7 +3,7 @@ var width;
 var height;
 var bombs;
 var skillLevel;
-var bool=true; //stating if all values are correct
+var allFine=true; //stating if all values are correct
 var focus; //where the focus is directed
 var fieldNeighbourhood=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
 var fieldsToReveal; // will count how many fields we still have to reveal before the game is finished
@@ -11,6 +11,7 @@ var bombsCounter //for displaying how many bombs to flag we have left
 var startTime; //the time of the first click
 var endTime; //the time of the last click
 var firstClick=true; //checking if we clicked for the first time
+var skills=["beginner","intermediate","expert","custom"];
 
 function onSubmit() {
     width=document.parameters.width.value
@@ -18,18 +19,21 @@ function onSubmit() {
     bombs=document.parameters.bombs.value;
     fieldsToReveal=(height*width)-bombs;
     bombsCounter=bombs;
-    if (!bool) {
+    if (allFine) {
+        var area=width*height;
+        if (area<=bombs) {
+            alert("Too many bombs you dumb fuck!");
+            document.parameters.bombs.focus();
+        }
+        for (var i=0; i<4; i++) {
+            if(document.parameters.skill_level[i].checked) {
+                skillLevel=skills[i];
+            }
+        }
+        alert (skillLevel);
+        var gameMatrix=tableCreation(height,width,bombs); // if all is fine then we can proceed to generating the table
+        onClicking(gameMatrix,height,width);
     }
-    else {
-    var area=width*height;
-    if (area<=bombs) {
-        alert("Too many bombs you dumb fuck!");
-        document.parameters.bombs.focus();
-    }
-    var gameMatrix=tableCreation(height,width,bombs); // if all is fine then we can proceed to generating the table
-    onClicking(gameMatrix,height,width);
-    }
-    
 }
 
 function skill_levelOnClick() {
@@ -39,20 +43,22 @@ function skill_levelOnClick() {
             document.parameters.width.value=defaultValues[i][0];
             document.parameters.height.value=defaultValues[i][1];
             document.parameters.bombs.value=defaultValues[i][2];
-            if(i==3) {
+            skillLevel=skills[i];
+            if(i==3) { //we allow putting custom parameters for the custom type
                 document.parameters.width.removeAttribute("readonly");
                 document.parameters.height.removeAttribute("readonly");
                 document.parameters.bombs.removeAttribute("readonly");    
             }
-            if(i!=3) {
+            if(i!=3) { //so we can't change the default parameters
                 document.parameters.width.setAttribute("readonly","true");
                 document.parameters.height.setAttribute("readonly","true");
                 document.parameters.bombs.setAttribute("readonly","true");               
             }
         }
     }
-
 }
+
+// in the functions below the validation is added in case the browser doesn't support HTML5
 
 function widthOnChange() {
     width=document.parameters.width.value;
@@ -62,14 +68,13 @@ function widthOnChange() {
         alert("It's not a number between 8 and 30!");
         focus=document.parameters.width;
         focus.focus(); // we focus on the width cell 
-        bool=false; // because now we have invalid value
+        allFine=false; // because now we have invalid value
     }
     else {
-        bool=true; // now the value is correct
+        allFine=true; // now the value is correct
     }
 }
 
-// in the function below the validation is added in case the browser doesn't support HTML5
 
 function heightOnChange() {
     height=document.parameters.height.value;
@@ -79,10 +84,10 @@ function heightOnChange() {
         alert("It's not a number between 8 and 24!");
         focus=document.parameters.height;
         focus.focus();
-        bool=false; 
+        allFine=false; 
     }
     else {
-        bool=true;
+        allFine=true;
     }
 }
 
@@ -94,16 +99,16 @@ function bombsOnChange() {
         alert("It's not a number between 10 and 667!");
         focus=document.parameters.bombs;
         focus.focus();
-        bool=false;
+        allFine=false;
     }
      else {
-        bool=true;
+        allFine=true;
     }
 }
 
 //if some moron puts invalid data, don't let the dumb fuck move to a different cell!
 function onBlur() {
-    if (!bool)
+    if (!allFine)
     {
         focus.focus();
         }
@@ -277,7 +282,6 @@ function onClicking(gameMatrix,height,width) {
                     this.className="flag";
                     bombsCounter--;
                 }
-
             }
             
 
@@ -289,12 +293,15 @@ function onClicking(gameMatrix,height,width) {
                 gameTime=gameTime/100;
                 alert("You won!");
                 alert(gameTime);
+                var nick=prompt("Enter your nick", "Anon");
+// contacting with database
+                get("saper.php?nick="+nick+"&time="+gameTime+"&skillLevel="+skillLevel).then(function(phpresult){document.getElementById("highscores").innerHTML = phpresult;
+                }).catch(function(err){
+                alert(err);
+  })
             }
         }
-
-
     }
-
 }
 // function which will reveal all the adjacent cells to a cliked zero 
 // (and to all the zeroes in the neighbourhood) and changes their class to "clicked"
@@ -303,18 +310,67 @@ function revealingZeros(xcord,ycord,gameMatrix,height,width){
     for (var field=0; field<8; field++) {
     var x=parseInt(xcord)+parseInt(fieldNeighbourhood[field][0]);
     var y=parseInt(ycord)+parseInt(fieldNeighbourhood[field][1]);
-    if(x>=0 && x<height && y>=0 && y<width) {
-        newId=x+"."+y; //for the sake of changing class of revealed cells
-        if (gameMatrix[x][y]=="0" && document.getElementById(newId).className==""){
-            document.getElementById(newId).className="clicked";
-            fieldsToReveal--;
-            revealingZeros(x,y,gameMatrix,height,width); // if we run into a zero, then we run the function again
+        if(x>=0 && x<height && y>=0 && y<width) {
+            newId=x+"."+y; //for the sake of changing class of revealed cells
+            if (gameMatrix[x][y]=="0" && document.getElementById(newId).className==""){
+                document.getElementById(newId).className="clicked";
+                fieldsToReveal--;
+                revealingZeros(x,y,gameMatrix,height,width); // if we run into a zero, then we run the function again
+                }
+            else if (document.getElementById(newId).className=="") {
+                document.getElementById(newId).className="clicked";
+                fieldsToReveal--;
             }
-        else if (document.getElementById(newId).className=="") {
-            document.getElementById(newId).className="clicked";
-            fieldsToReveal--;
-        }
         }
     }
 }
 
+// Promises
+
+function get(url) {
+  
+  var spinner=document.getElementById("spinner");
+  spinner.style.visibility="visible";
+  // Return a new promise.
+  return new Promise(function(resolve, reject) {
+    // Do the usual XHR stuff
+    var req = new XMLHttpRequest();
+    req.open('GET', url, true);
+
+    req.onload = function() {
+      // This is called even on 404 etc
+      // so check the status
+      if (req.status == 200) {
+        setTimeout(function(){
+          // Resolve the promise with the response text
+          resolve(req.response);
+          spinner.style.visibility="hidden";
+        }, 500); //setTimeout simulating server delay
+      }
+      else {
+        // Otherwise reject with the status text
+        // which will hopefully be a meaningful error
+        reject(Error(req.statusText));
+        spinner.style.visibility="hidden";
+      }
+    };
+
+    // Handle network errors
+    req.onerror = function() {
+      reject(Error("Network Error"));
+      spinner.style.visibility="hidden";
+    };
+    
+    
+    // Make the request
+    req.send();
+  });
+}
+
+// function for printing out highscores
+function highscores(nick,gameTime,skillLevel) {
+  get("saper.php?nick="+nick+"&time="+gameTime+"&skillLevel="+skillLevel).then(function(phpresult){document.getElementById("highscores").innerHTML = phpresult;
+  }).catch(function(err){
+    alert(err);
+  })
+}
