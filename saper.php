@@ -27,7 +27,7 @@
 //we want to keep track of only 10 results
         $sql="SELECT COUNT(*) FROM ".$skillLevel;
         $record_nr=mysql_result(mysql_query($sql),0);
-        if ($record_nr>10) {
+        while ($record_nr>10) {
             $deletion="DELETE FROM ".$skillLevel." WHERE gametime ORDER BY gametime DESC LIMIT 1";
             mysql_query($deletion);
         }

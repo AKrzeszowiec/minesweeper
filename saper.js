@@ -293,12 +293,14 @@ function onClicking(gameMatrix,height,width) {
                 gameTime=gameTime/100;
                 alert("You won!");
                 alert(gameTime);
-                var nick=prompt("Enter your nick", "Anon");
+                if(skillLevel!="custom") {
+                    var nick=prompt("Enter your nick", "Anon");
 // contacting with database
-                get("saper.php?nick="+nick+"&time="+gameTime+"&skillLevel="+skillLevel).then(function(phpresult){document.getElementById("highscores").innerHTML = phpresult;
-                }).catch(function(err){
-                alert(err);
-  })
+                    get("saper.php?nick="+nick+"&time="+gameTime+"&skillLevel="+skillLevel).then(function(phpresult){document.getElementById("highscores").innerHTML = phpresult;
+                    }).catch(function(err){
+                    alert(err);
+                    })
+                }
             }
         }
     }
@@ -325,7 +327,7 @@ function revealingZeros(xcord,ycord,gameMatrix,height,width){
     }
 }
 
-// Promises
+// Promises for server connection handling with added spinner and delay simulation
 
 function get(url) {
   
@@ -341,7 +343,7 @@ function get(url) {
       // This is called even on 404 etc
       // so check the status
       if (req.status == 200) {
-        setTimeout(function(){
+        setTimeout(function(){ 
           // Resolve the promise with the response text
           resolve(req.response);
           spinner.style.visibility="hidden";
@@ -367,10 +369,3 @@ function get(url) {
   });
 }
 
-// function for printing out highscores
-function highscores(nick,gameTime,skillLevel) {
-  get("saper.php?nick="+nick+"&time="+gameTime+"&skillLevel="+skillLevel).then(function(phpresult){document.getElementById("highscores").innerHTML = phpresult;
-  }).catch(function(err){
-    alert(err);
-  })
-}
